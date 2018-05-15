@@ -38,8 +38,8 @@ $ docker create loam:python27 python -c "print('Hello, world!')"
 
 # show the container list and that it was created
 $ docker ps -a
-CONTAINER ID        IMAGE               COMMAND                  ...
-1c55cc80825e        loam:python27       "python -c 'print('H…"   ...
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS
+1c55cc80825e        loam:python27       "python -c 'print('H…"   3 seconds ago       Created
 
 # start the container, attach STDOUT to see the output
 $ docker start -a 1c55cc80825e
