@@ -1,4 +1,4 @@
-FROM loam:r34
+FROM broadinstitute/dig-loam:r34
 
 # all main work in root
 WORKDIR /root

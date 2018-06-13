@@ -4,7 +4,7 @@ FROM ubuntu:xenial
 WORKDIR /root
 
 # install python 3.4 in the image
-RUN apt-get update && apt-get -y install apt-transport-https libjpeg8-dev libfreetype6-dev libpng-dev libagg-dev
+RUN apt-get update && apt-get -y install apt-utils apt-transport-https libjpeg8-dev libfreetype6-dev libpng-dev libagg-dev
 RUN apt-get install -y python2.7 python-setuptools python-matplotlib
 RUN easy_install pip 
 

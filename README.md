@@ -10,36 +10,36 @@ The base Docker image used for these images is `ubuntu:xenial` (16.04). The imag
 
 ```bash
 # First build the python27 image
-docker --tag loam:python27 --force-rm python27
+docker build --tag broadinstitute/dig-loam:python27 --force-rm python27
 
 # Next, build the r34 image
-docker --tag loam:r34 --force-rm r34
+docker build --tag broadinstitute/dig-loam:r34 --force-rm r34
 
 # Finally, build the tools image
-docker --tag loam:tools --force-rm tools
+docker build --tag broadinstitute/dig-loam:tools --force-rm tools
 ```
 
 To see the images, run `docker images`:
 
 ```
-REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE  
-loam                universal           11873c3d0b78        29 minutes ago      2.1GB 
-loam                r34                 e8625624bd7d        2 hours ago         1.48GB
-loam                python27            138d26c94857        2 hours ago         685MB 
-ubuntu              xenial              0b1edfbffd27        2 weeks ago         113MB 
+REPOSITORY                  TAG                 IMAGE ID            ...
+broadinstitute/dig-loam     universal           11873c3d0b78
+broadinstitute/dig-loam     r34                 e8625624bd7d
+broadinstitute/dig-loam     python27            138d26c94857
+ubuntu                      xenial              0b1edfbffd27
 ```
 
 To test one of the images, you need to create a container from it and start it.
 
 ```bash
 # create a new container from the python image
-$ docker create loam:python27 python -c "print('Hello, world!')"
+$ docker create broadinstitute/dig-loam:python27 python -c "print('Hello, world!')"
 1c55cc80825eb73e82e6615a216ebda78907eba1559ba05f330bc1620061edc5
 
 # show the container list and that it was created
 $ docker ps -a
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS
-1c55cc80825e        loam:python27       "python -c 'print('H…"   3 seconds ago       Created
+CONTAINER ID        IMAGE                                  COMMAND                  CREATED             STATUS
+1c55cc80825e        broadinstitute/dig-loam:python27       "python -c 'print('H…"   3 seconds ago       Created
 
 # start the container, attach STDOUT to see the output
 $ docker start -a 1c55cc80825e
@@ -47,6 +47,22 @@ Hello, world!
 
 # get rid of the stopped container now that we don't need it
 $ docker rm 1c55cc80825e
+```
+
+## Pushing an Image to DockerHub
+
+Log into docker:
+
+```bash
+$ docker login
+```
+
+Push an image:
+
+```bash
+$ docker push broadinstitute/dig-loam:python27
+$ docker push broadinstitute/dig-loam:r34
+$ docker push broadinstitute/dig-loam:tools
 ```
 
 ## Sharing an Image

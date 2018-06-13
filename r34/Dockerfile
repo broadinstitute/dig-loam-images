@@ -1,4 +1,4 @@
-FROM loam:python27
+FROM broadinstitute/dig-loam:python27
 
 # all main work in root
 WORKDIR /root
