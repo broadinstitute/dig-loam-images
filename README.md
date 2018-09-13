@@ -136,3 +136,15 @@ This is the full image, build from `loam:r34` that has all the additional binari
 * samtools
 
 _Note: LocusZoom is installed in program-form only! It does not contain the reference genome!_
+
+## Image: `loam:hail`
+
+This is the full image, build from `loam:tools` containing hail and its prerequisites.
+
+#### Additional Tools/Scripts
+
+* Java JDK
+* Spark
+* hail 0.1
+
+_Note: Some environment variables are also updated as required by hail
