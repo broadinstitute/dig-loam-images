@@ -148,3 +148,10 @@ This is the full image, build from `loam:tools` containing hail and its prerequi
 * hail 0.1
 
 _Note: Some environment variables are also updated as required by hail
+
+## docker2singularity script
+
+Run this script as root to convert a Docker image to a Singularity one:
+
+`sudo docker2singularity foo` => converts foo Docker image to foo.simg Singularity one
+
