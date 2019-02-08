@@ -1,7 +1,7 @@
 FROM broadinstitute/dig-loam:python27
 
-# all main work in root
-WORKDIR /root
+# all main work in work
+WORKDIR /work
 
 # install python-matplotlib
 RUN apt-get update && \
@@ -11,5 +11,5 @@ RUN apt-get update && \
 RUN pip install --upgrade pip && \
 	pip install -q numpy pandas scipy matplotlib seaborn pysam ghostscript decorator==4.2.1
 
-# open /root directory permissions
-RUN chmod -R 777 /root
+# open /work directory permissions
+RUN chmod -R 777 /work

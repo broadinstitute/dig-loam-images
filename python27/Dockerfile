@@ -1,7 +1,16 @@
 FROM ubuntu:xenial
 
-# all main work in root
-WORKDIR /root
+# all main work in work
+WORKDIR /work
+
+# set locale
+RUN apt-get update && \
+	apt-get -y install locales && \
+	locale-gen en_US.UTF-8
+
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
 
 # install standard libraries and tools
 RUN apt-get update && \
