@@ -15,15 +15,32 @@ lazy val Resolvers = new {
   val SonatypeSnapshots = Resolver.sonatypeRepo("snapshots")
 }
 
+// disable .jar publishing 
+publishArtifact in (Compile / packageBin) := false
+// disable publishing the javadoc jar
+publishArtifact in (Compile / packageDoc) := false
+// disable publishing the source jar
+publishArtifact in (Compile / packageSrc) := false
+
+// create an Artifact for publishing a .zip file instead of a .jar
+artifact in (Compile / packageBin) := {
+  val previous: Artifact = (artifact in (Compile / packageBin)).value
+
+  previous.withType("zip").withExtension("zip")
+}
+
 lazy val root = (project in file("."))
   .settings(
     name := "dig-loam-images",
     organization := Orgs.DIG,
     //NB: version set in version.sbt
     publishTo := Some(Resolvers.LocalRepo),
+    // add the .zip file to what gets published 
+    addArtifact(artifact in (Compile / packageBin), Compile / packageBin).settings
   )
 
-resourceDirectory in Compile := baseDirectory.value / "recipes"
+//Make sure the contents of recipes/ makes it into binary artifact
+(resourceDirectory in Compile) := baseDirectory.value / "recipes"
 
 //Enables `buildInfoTask`, which bakes git version info into the LS jar.
 enablePlugins(GitVersioning)
