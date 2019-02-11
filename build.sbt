@@ -1,5 +1,3 @@
-import Dependencies._
-
 lazy val Orgs = new {
   val DIG = "org.broadinstitute.dig"
 }
@@ -9,13 +7,32 @@ lazy val Paths = new {
   val LocalRepo = "/humgen/diabetes/users/dig/loamstream/repo"
 }
 
-lazy val Resolvers = new {
+lazy val MyResolvers = new {
   val LocalRepo = Resolver.file("localRepo", new File(Paths.LocalRepo))
   val SonatypeReleases = Resolver.sonatypeRepo("releases")
   val SonatypeSnapshots = Resolver.sonatypeRepo("snapshots")
+  //It would be nice to put the S3 resolver here, but it has to be done inside a macro, like with :=, etc. :\
 }
 
-// disable .jar publishing 
+//Publish Ivy Style
+publishMavenStyle := false
+//Publish locally (to the Broad FS) and to S3
+publishResolvers := Seq[Resolver](
+  MyResolvers.LocalRepo,
+  {
+    val prefix = if (isSnapshot.value) "snapshots" else "releases"
+
+    val bucket = "dig-integration-tests"
+
+    s3resolver.value(s"My S3 bucket/${prefix}", s3(s"${bucket}/${prefix}")).withIvyPatterns
+  }
+)
+
+//Make it so `publish` publishes to both of the above places.  Without this, we'd have to manually
+//multi-publish with `publishAll`.
+publish := publishAll.value
+
+// disable publishing the binary jar
 publishArtifact in (Compile / packageBin) := false
 // disable publishing the javadoc jar
 publishArtifact in (Compile / packageDoc) := false
@@ -31,10 +48,9 @@ artifact in (Compile / packageBin) := {
 
 lazy val root = (project in file("."))
   .settings(
+    //NB: version set in version.sbt
     name := "dig-loam-images",
     organization := Orgs.DIG,
-    //NB: version set in version.sbt
-    publishTo := Some(Resolvers.LocalRepo),
     // add the .zip file to what gets published 
     addArtifact(artifact in (Compile / packageBin), Compile / packageBin).settings
   )
@@ -42,7 +58,7 @@ lazy val root = (project in file("."))
 //Make sure the contents of recipes/ makes it into binary artifact
 (resourceDirectory in Compile) := baseDirectory.value / "recipes"
 
-//Enables `buildInfoTask`, which bakes git version info into the LS jar.
+//Enables `buildInfoTask`, which bakes git version info into the jar as the file versionInfo_<project-name>.properties.
 enablePlugins(GitVersioning)
 
 val buildInfoTask = taskKey[Seq[File]]("buildInfo")
@@ -58,7 +74,7 @@ buildInfoTask := {
 
   val buildDate = java.time.Instant.now
 
-  val file = dir / "versionInfo.properties"
+  val file = dir / s"versionInfo_${n}.properties"
 
   val contents = s"name=${n}\nversion=${v}\nbranch=${branch}\nlastCommit=${lastCommit.getOrElse("")}\nuncommittedChanges=${anyUncommittedChanges}\ndescribedVersion=${describedVersion.getOrElse("")}\nbuildDate=${buildDate}\n"
 
@@ -68,26 +84,4 @@ buildInfoTask := {
 }
 
 (resourceGenerators in Compile) += buildInfoTask.taskValue
-
-//TODO: Is the below necessary?
-import ReleaseTransformations._
-
-releaseProcess := Seq[ReleaseStep](
-  checkSnapshotDependencies, // : ReleaseStep
-  inquireVersions, // : ReleaseStep
-  runClean, // : ReleaseStep
-  runTest, // : ReleaseStep
-  setReleaseVersion, // : ReleaseStep
-  commitReleaseVersion, // : ReleaseStep, performs the initial git checks
-  tagRelease,           // : ReleaseStep
-  // run 'publishLocal' instead of 'publish', since publishing to a repo on the Broad FS never resulted in
-  // artifacts that could be resolved by other builds. :(
-  // See: https://github.com/sbt/sbt-release#can-we-finally-customize-that-release-process-please
-  //      https://stackoverflow.com/questions/44058275/add-docker-publish-step-to-sbt-release-process-with-new-tag
-  //      https://github.com/sbt/sbt/issues/1917
-  releaseStepCommand("publishLocal"),
-  setNextVersion, // : ReleaseStep
-  commitNextVersion, // : ReleaseStep
-  pushChanges // : ReleaseStep, also checks that an upstream branch is properly configured
-)
 
