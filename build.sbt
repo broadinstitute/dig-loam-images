@@ -14,17 +14,17 @@ lazy val MyResolvers = new {
   //It would be nice to put the S3 resolver here, but it has to be done inside a macro, like with :=, etc. :\
 }
 
-//Publish Ivy Style
-publishMavenStyle := false
+lazy val Buckets = new {
+  val digRepo = "dig-repo"
+}
+
 //Publish locally (to the Broad FS) and to S3
 publishResolvers := Seq[Resolver](
   MyResolvers.LocalRepo,
   {
     val prefix = if (isSnapshot.value) "snapshots" else "releases"
 
-    val bucket = "dig-integration-tests"
-
-    s3resolver.value(s"My S3 bucket/${prefix}", s3(s"${bucket}/${prefix}")).withIvyPatterns
+    s3resolver.value(s"${Buckets.digRepo}/${prefix}", s3(s"${Buckets.digRepo}/${prefix}"))
   }
 )
 
